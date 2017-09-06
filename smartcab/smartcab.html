@@ -15987,9 +15987,23 @@ ZmZmTeIAy8zMzMzMrEn+P/tkf1ZedMrFAAAAAElFTkSuQmCC
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><strong>Answer:</strong></p>
+<p><strong>Please summarize what the optimal policy is for the smartcab in the given environment. What would be the best set of instructions possible given what we know about the environment? You can explain with words or a table, but you should thoroughly discuss the optimal policy.</strong></p>
+<p><strong>For reliability:</strong> The agent should always follow the waypoint</p>
+<p><strong>For safety:</strong> The agent have abide the traffic laws:</p>
+
+<pre><code>* If waypoint is Right and Left is not going forward, then go ahead in a red light
+* If waypoint is Forward or Right, then go ahead in a green light
+* If waypoint is Forward or Left, then stop in a red light
+* If waypoint is Right and oncoming is None, then go ahead in a red light 
+
+
+</code></pre>
+<p>The most optimal policy is combining both</p>
+<p><strong>Next, investigate the 'sim_improved-learning.txt' text file to see the results of your improved Q-Learning algorithm. For each state that has been recorded from the simulation, is the policy (the action with the highest value) correct for the given state? Are there any states where the policy is different than what would be expected from an optimal policy?</strong></p>
+<p>Each states are correctly associated with actions, according to the optimal policy</p>
+<p><strong>Provide a few examples from your recorded Q-table which demonstrate that your smartcab learned the optimal policy. Explain why these entries demonstrate the optimal policy.</strong></p>
 <p>For states given by (waypoint, inputs['light'], inputs['left'], inputs['oncoming'])</p>
-<p>The main rule the agent should really understand, is the turning right function when there is a right light, otherwise for a red light it always choose None (going forward or left with a red light, is the biggest penalty value), and choosing always None when waypoint is left and if the inputs['left'] is going forward</p>
-<p>The action with the highest values is</p>
+<p>The action with the most positive action values is</p>
 
 <pre><code>('left', 'green', None, 'right')
  -- forward : -0.20
@@ -16003,14 +16017,78 @@ ZmZmTeIAy8zMzMzMrEn+P/tkf1ZedMrFAAAAAElFTkSuQmCC
  -- right : 0.00
  -- None : 2.71
  -- left : 0.00</code></pre>
-<p>in the other hand, the the policy with most negative values is</p>
+<p>in the other hand, the the policy with most negative action values is</p>
 
 <pre><code> ('right', 'red', 'forward', None)
  -- forward : -32.69
  -- right : -16.62
  -- None : 1.62
  -- left : -32.31</code></pre>
-<p>For the extreme values the actions taken for the given state are correct, I didn't see any state with a different result that I expected</p>
+<p>A random state/actions</p>
+
+<pre><code>('forward', 'green', None, 'left')
+ -- right : -0.19
+ -- forward : 1.12
+ -- None : -5.35
+ -- left : 0.00</code></pre>
+<ul>
+<li>If waypoint is Right and Left is not going forward, then go ahead in a red light</li>
+</ul>
+
+<pre><code>('right', 'red', 'right', 'left')
+ -- right : 2.02
+ -- forward : 0.00
+ -- None : 1.01
+ -- left : 0.00</code></pre>
+<ul>
+<li>If waypoint is Forward or Right, then go ahead in a green light</li>
+</ul>
+
+<pre><code>('forward', 'green', 'left', 'left')
+ -- right : 0.00
+ -- forward : 2.54
+ -- None : -5.17
+ -- left : -0.05</code></pre>
+<ul>
+<li><p>If waypoint is Forward or Left, then stop in a red light</p>
+
+<pre><code>('forward', 'red', None, 'right')
+-- right : 0.00
+-- forward : 0.00
+-- None : 1.30
+-- left : 0.00</code></pre>
+</li>
+<li><p>If waypoint is Right and oncoming is None, then go ahead in a red light</p>
+
+<pre><code>('right', 'red', 'right', None)
+-- right : 2.25
+-- forward : 0.00
+-- None : 0.23
+-- left : -31.48</code></pre>
+<p>Observing these values, we can see that the 'maxQ' is the best for each state for the optimal policy I choosed</p>
+</li>
+</ul>
+<p><strong>Try to find at least one entry where the smartcab did not learn the optimal policy. Discuss why your cab may have not learned the correct policy for the given state.</strong></p>
+
+<pre><code>('right', 'green', 'left', None)
+ -- right : 0.00
+ -- forward : 0.86
+ -- None : -4.90
+ -- left : -0.12</code></pre>
+<p>In this occasion the agent should turn right (as expected by the waypoint and the enviroment) but it went forward instead, this could happen because the agend may need more trials to learn well, notices that the forward reward is &lt; 1, when the average of action taken rewards are &gt; 1, and the expected actions is 0, is not a penalty</p>
+
+<pre><code>('left', 'green', 'forward', None)
+ -- right : 0.00
+ -- forward : 0.00
+ -- None : -4.66
+ -- left : 1.73</code></pre>
+
+<pre><code>('left', 'green', 'left', 'left')
+ -- right : 0.00
+ -- forward : 0.00
+ -- None : -5.43
+ -- left : 1.93</code></pre>
+<p>In this case, these are not safety moves but is legal, the agent should do nothing, again this could be avoided with more trials, the agent could have had an accident, and learn from it</p>
 
 </div>
 </div>
@@ -16043,9 +16121,9 @@ ZmZmTeIAy8zMzMzMrEn+P/tkf1ZedMrFAAAAAElFTkSuQmCC
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><strong>Answer:</strong></p>
 <ol>
-<li><p>The agent doesn't know the map, every actions is take is given by the traffic law and distance, so it will make difficult to make predict the future if it doesn't know where intersection are (when it has to take actions)</p>
+<li><p>The agent doesn't know the map, every actions is take is given by the traffic law and distance, so it will make difficult to make predict the future if it doesn't know where intersection are (when it has to take actions), what it immediately perceive is the current states and not what would be the next step.</p>
 </li>
-<li><p>Every trial are different, the agent is not trying to reach a fixed B from a fixed A, those location are random for every trial, this will affect the use of future reward</p>
+<li><p>Every trial are different, the agent is not trying to reach a fixed B from a fixed A, those location are random for every trial, that means that there's no way to learn where to go, so every choice is not correlated to future trials</p>
 </li>
 </ol>
 
