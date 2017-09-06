@@ -112,7 +112,6 @@ class LearningAgent(Agent):
         self.state = state
         self.next_waypoint = self.planner.next_waypoint()
         action = None
-        print(self.valid_actions)
         ###########
         ## TO DO ##
         ###########
@@ -123,8 +122,6 @@ class LearningAgent(Agent):
         if not self.learning:
             action = random.choice(self.valid_actions)
         elif self.learning and random.random() > self.epsilon:
-            action = self.get_maxQ(state)
-
             valid_actions = []
             maxQ = self.get_maxQ(state)
             for act in self.Q[state]:
