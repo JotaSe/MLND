@@ -45,8 +45,8 @@ class LearningAgent(Agent):
             self.epsilon = 0
             self.alpha = 0
         else:
-            #self.epsilon -= 0.05
-            self.epsilon *= 0.99
+            # self.epsilon -= 0.05
+            self.epsilon *= 0.999
 
         return None
 
@@ -98,8 +98,9 @@ class LearningAgent(Agent):
         # When learning, check if the 'state' is not in the Q-table
         # If it is not, create a new dictionary for that state
         #   Then, for each action available, set the initial Q-value to 0.0
-        if self.learning and state not in self.Q:
-            self.Q[state] = self.Q.get(state, {None:0.0, 'forward':0.0, 'left':0.0, 'right':0.0})
+        # if self.learning and state not in self.Q:
+            # self.Q[state] = self.Q.get(state, {None:0.0, 'forward':0.0, 'left':0.0, 'right':0.0})
+        self.Q[state] = self.Q.get(state, {None:0.0, 'forward':0.0, 'left':0.0, 'right':0.0})
 
         return
 
@@ -119,9 +120,9 @@ class LearningAgent(Agent):
         # When learning, choose a random action with 'epsilon' probability
         # Otherwise, choose an action with the highest Q-value for the current state
         # Be sure that when choosing an action with highest Q-value that you randomly select between actions that "tie".
-        if not self.learning:
+        if not self.learning and random.random() < self.epsilon:
             action = random.choice(self.valid_actions)
-        elif self.learning and random.random() > self.epsilon:
+        else:
             valid_actions = []
             maxQ = self.get_maxQ(state)
             for act in self.Q[state]:
@@ -179,7 +180,7 @@ def run():
     #    * learning   - set to True to force the driving agent to use Q-learning
     #    * epsilon - continuous value for the exploration factor, default is 1
     #    * alpha   - continuous value for the learning rate, default is 0.5
-    agent = env.create_agent(LearningAgent, learning=True, alpha = 0.8, epsilon = 1)
+    agent = env.create_agent(LearningAgent, learning=True, alpha = 0.7, epsilon = 1)
 
     ##############
     # Follow the driving agent
